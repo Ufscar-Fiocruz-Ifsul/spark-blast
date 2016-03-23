@@ -32,7 +32,7 @@ scala> pipeRDD.saveAsTextFile(“output”)
 
 5 - In this point you have executed de Spark Blast. Now you have to merge the parts generated with Apache Spark, so execute:
 
-$ hadoop fs -getmerge
+$ hadoop fs -getmerge gs://hadoop-spark-fiocruz/output output.blast
 
 6 - And now, put that file in repository, we use a Google Storage:
 
