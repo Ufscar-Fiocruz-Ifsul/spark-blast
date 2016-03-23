@@ -1,0 +1,48 @@
+#!/bin/bash
+#slaveshadoop="/home/hadoop/hadoop-install/etc/hadoop/slaves"
+#hadoop="/home/hadoop/hadoop-install";
+#spark="/home/hadoop/spark-install";
+#blast="/home/hadoop/blast*";
+#echo "Dividindo querys..."
+#`/home/hadoop/dividi-query`
+#echo "Querys divididas."
+echo "Distribuindo dados entre os nos"
+# Para copiar as partes sequencias para cada nó e depois cada Application
+`tail -128 /home/hadoop/spark-install/logs/spark-hadoop-org.apache.spark.deploy.master.Master-1-hadoopspark-hadoop-m-1-vm.out | grep Launc | cut -d " " -f 10 | cut -d "-" -f 3 > nos`
+`tail -128 /home/hadoop/spark-install/logs/spark-hadoop-org.apache.spark.deploy.master.Master-1-hadoopspark-hadoop-m-1-vm.out | grep Launc | cut -d " " -f 7 > application`
+nos="/home/hadoop/nos";
+application="/home/hadoop/application";
+#slaves="/home/hadoop/spark-install/conf/slaves";
+##teste="/home/hadoop/testes-blast";
+#executa="/home/hadoop/spark-install/bin/executablast.sh";
+num=0;
+part="/home/hadoop/part-"$num;
+while true
+do
+	read -r line1 <&3 || break
+	read -r line2 <&4 || break
+#	localDB="/mnt/hadoop-disk/hadoop/spark/work/"$line2"/"
+	localQuery="/mnt/hadoop-disk/hadoop/spark/work/"$line2"/query.fa"
+	linha=`nslookup $line1 | grep hadoo | cut -d " " -f 3 | cut -d "." -f 1`
+#	`scp -r $hadoop $line:/home/hadoop`;
+##	`scp -r $spark $line:/home/hadoop`;
+#	`scp -r $blast $line:/home/hadoop`;
+#	`scp -r $teste $line:/home/hadoop`;
+#	`scp $executa $linha:/home/hadoop/spark-install/bin/executablast.sh`;
+
+#Meu banco ficará estático e distribuire a query
+	`scp $part $linha:$localQuery`;
+#	`scp $part $linha:/home/hadoop/spark-install/bin/query.fa`;
+#	`scp /home/hadoop/testes-blast/6hours/database.fa.p* $linha:$localDB`;
+#	echo $linha;
+#	echo $linha.$localDB
+#	`scp $slaveshadoop $line1:/home/hadoop/hadoop-install/etc/hadoop/slaves &`;
+#	`scp $slaves $line1:/home/hadoop/spark-install/conf/slaves &`;
+#	echo $linha;
+#	`scp /home/hadoop/spark-install/conf/spark-env.sh hadoopspark-hadoop-w-1-vm:/home/hadoop/spark-install/conf/spark-env.sh`
+	num=$(($num+1));
+	part="/home/hadoop/part-"$num;
+done 3<nos 4<application
+echo "Dados distribuidos"
+rm nos application
+#rm part-*

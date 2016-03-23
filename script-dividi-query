@@ -1,0 +1,47 @@
+#!/bin/bash
+# Arquivo com as querys a dividir pelos nos
+consulta="/home/hadoop/query.fa";
+# Quantidade de sequencias nos arquivos, identificadas pelo >
+qtd_sequencia=`fgrep -o ">" $consulta | wc -l`;
+echo $qtd_sequencia;
+#qtd_sequencia=10;
+# Recebmos a quantidade de nos para dividir as querys.
+echo "Digite a quantidade de nos:";
+read nos;
+# Por padrao cada no recebera essa quantidade de querys
+sequencia_por_no=$(($qtd_sequencia/$nos));
+# Esse resto de sequencias sera dividoido entre os nos quando a divisao nao for exata
+resto=$(($qtd_sequencia-($sequencia_por_no*$nos)));
+sequencia_por_no_mais=$(($sequencia_por_no+1));
+# cada no ira receber a quantidade determinada de linhas, respeitando os valores de >
+# devo percorrer o arquivo até achar a quantidade de sequencia por nó for menor que o valor achado
+                # esse valor do arquivo sera gravado num novo arquivo;
+auxlinha=-1;
+auxnos=0;
+auxsequenciano=0;
+arquivo="part-"$auxnos;
+`touch $arquivo`;
+while read line;
+do
+        # se o resto for igual a 0 valor padrao
+        if [ "$resto" -eq 0 ];
+        then
+                auxsequenciano=$sequencia_por_no;
+        # se o resto for diferente de 0 cada no recebera uma nova sequencia
+        else
+                auxsequenciano=$sequencia_por_no_mais;
+                resto=$(($resto-1));
+                auxlinha=$(($auxlinha-1));
+        fi
+        linha=${line:0:1};
+        if [ $linha = ">" ]; then
+                auxlinha=$(($auxlinha+1));
+        fi
+        if [ $auxlinha -eq $auxsequenciano ]; then
+                auxnos=$(($auxnos+1));
+                arquivo="part-"$auxnos;
+                `touch $arquivo`;
+                auxlinha=0;
+        fi
+        echo $line >> $arquivo;
+done <  $consulta;
