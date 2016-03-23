@@ -12,7 +12,7 @@ $./dividi-query
 
 2 - Execute spark-shell in a window;
 
-$spark-shell // you can specify some atributes, use --help for that.
+$spark-shell --executor-memory 5999m --driver-memory 5999m --num-executors 128 --executor-cores 1 --driver-cores 128 // you can specify some atributes, use --help for that.
 
 3 - In other window execute one script that disbrituted the split querys in step 1;
 
